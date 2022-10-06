@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const uuid = require('uuid');
 
-// Create database schema
+// Create PAYINS database schema
 const schema = Joi.object({
     transaction_id: Joi.string()
         .min(3)
