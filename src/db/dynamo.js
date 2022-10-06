@@ -20,20 +20,19 @@ class dynamoHelper {
   };
 
   async insert(json) {
-    console.log("Inserting data...")
+    var response = null;
     var params = {
       TableName: this.table_name,
       Item: json
     };
-    await this.docClient.put(params, function(err, data) {
+    response = await this.docClient.put(params, function(err, data) {
       if (err) {
         console.log("Error", err);
-        return false;
       } else {
         console.log("Success", data);
-        return true;
       }
     }).promise();
+    return response;
   }
 
   async findOne(json) {

@@ -54,7 +54,7 @@ router.post('/', async (req, res, next) => {
             { reference_code, amount, currency, description }
         );
 
-        const new_payin = await payins.insert({
+        const payin = {
             "id": uuid.v4(),
             "reference_code": reference_code,
             "amount": amount,
@@ -62,10 +62,12 @@ router.post('/', async (req, res, next) => {
             "status": "PENDING",
             "status_code": "002",
             "description": description
-        });
+        }
+
+        const response = await payins.insert(payin);
 
         console.log('New payin has been created');
-        res.status(201).json(new_payin);
+        res.status(201).json(payin);
     } catch(error) {
         next(error);
     }
