@@ -1,5 +1,6 @@
 const express = require('express');
 const schema = require('../db/schemas/payin');
+const uuid = require('uuid');
 // const db = require('../db/connection');
 const db = require("../db/dynamo");
 
@@ -22,15 +23,18 @@ router.get('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
         const payin = await payins.findOne({
-            "transaction_id": id
+            "id": id
         });
+
+        console.log(payin);
 
         if(!payin) {
             const error = new Error('Payin transaction does not exist');
             return next(error);
         }
 
-    res.json(payin);
+        res.json(payin);
+
     } catch(error) {
         next(error);
     }
@@ -51,13 +55,12 @@ router.post('/', async (req, res, next) => {
         );
 
         const new_payin = await payins.insert({
-            "transaction_id": uuid.v4(),
+            "id": uuid.v4(),
             "reference_code": reference_code,
             "amount": amount,
             "currency": currency,
             "status": "PENDING",
             "status_code": "002",
-            "error_code": "",
             "description": description
         });
 

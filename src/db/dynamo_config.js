@@ -1,3 +1,5 @@
+const dotenv = require('dotenv');
+dotenv.config();
 module.exports = {
     aws_local_config: {
       //Provide details for local configuration

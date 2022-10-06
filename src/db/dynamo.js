@@ -1,12 +1,13 @@
-const AWS = require('aws-sdk');
-const config = require('./dynamo_config');
+var AWS = require('aws-sdk');
+var { aws_remote_config } = require('./dynamo_config');
 
 class dynamoHelper {
-
+  
   constructor(){
-    AWS.config.update(config.aws_remote_config);
+    AWS.config.update(aws_remote_config);
     this.docClient = new AWS.DynamoDB.DocumentClient();
     this.table_name = null;
+    console.log(aws_remote_config);
   }
 
   get(table_name){
@@ -15,14 +16,16 @@ class dynamoHelper {
     } else {
       this.table_name = table_name;
     }
+    return this;
   };
 
-  put(json) {
+  async insert(json) {
+    console.log("Inserting data...")
     var params = {
-      TableName: table_name,
+      TableName: this.table_name,
       Item: json
     };
-    docClient.put(params, function(err, data) {
+    await this.docClient.put(params, function(err, data) {
       if (err) {
         console.log("Error", err);
         return false;
@@ -30,44 +33,44 @@ class dynamoHelper {
         console.log("Success", data);
         return true;
       }
-    });
+    }).promise();
   }
 
-  findOne(json) {
+  async findOne(json) {
+    var response = null;
     var params = {
-      TableName: table_name,
+      TableName: this.table_name,
       Key: json
     };
-    docClient.get(params, function(err, data) {
+    response = await this.docClient.get(params, function(err, data) {
       if (err) {
           console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
-          return false;
       } else {
           console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
-          return data;
       }
-    });
+    }).promise();
+    return response["Item"];
   }
 
-  find(){
+  async find() {
+    var response = null;
     var params = {
-      TableName: table_name,
+      TableName: this.table_name,
       Select: "ALL_ATTRIBUTES"
     };
-    docClient.scan(params, function(err, data) {
+    response = await this.docClient.scan(params, function(err, data) {
       if (err) {
          console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
-         return false;
       } else {
          console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
-         return data;
       }
-    });
-  
+    }).promise();
+    return response["Items"];
   }
+
 
 };
 
-const db = dynamoHelper();
+const db = new dynamoHelper();
 
 module.exports = db;
