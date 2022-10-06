@@ -1,11 +1,12 @@
 const Joi = require('joi');
 const uuid = require('uuid');
 
+// Create database schema
 const schema = Joi.object({
     transaction_id: Joi.string()
         .min(3)
         .max(30)
-        .default(uuid.v4()),
+        .default(uuid.v4()), // Use uuid v4 for generating random tids
     reference_code: Joi.string()
         .min(3)
         .max(30)
